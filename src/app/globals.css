@@ -1,0 +1,231 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(240 10% 3.9%);
+
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(240 10% 3.9%);
+
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(240 10% 3.9%);
+
+  --color-primary: hsl(25 66% 47%);
+  --color-primary-foreground: hsl(0 0% 98%);
+
+  --color-secondary: hsl(240 4.8% 95.9%);
+  --color-secondary-foreground: hsl(240 5.9% 10%);
+
+  --color-muted: hsl(240 4.8% 95.9%);
+  --color-muted-foreground: hsl(240 3.8% 46.1%);
+
+  --color-accent: hsl(240 4.8% 95.9%);
+  --color-accent-foreground: hsl(240 5.9% 10%);
+
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+
+  --color-border: hsl(240 5.9% 90%);
+  --color-input: hsl(240 5.9% 90%);
+
+  --color-ring: hsl(246 80% 60%);
+}
+
+:root {
+  --font-poppins: 'Poppins', system-ui, -apple-system, sans-serif;
+
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+
+  --primary: 25 66% 47%;
+  /* Indigo/Violet ish - 246 80% 60% */
+  --primary-foreground: 0 0% 98%;
+
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+
+  /* Gray Borders as requested: Zinc 200 equivalent */
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+
+  --ring: 246 80% 60%;
+
+  --radius: 0.75rem;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-poppins), 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Modern board styling (sleek, professional) */
+.modern-board-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+}
+
+.notebook-paper {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+}
+
+.cell-slash {
+  position: relative;
+  overflow: hidden;
+}
+
+.cell-slash::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 14%;
+  width: 72%;
+  height: 3.5px;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  transform: translateY(-50%) rotate(-35deg);
+  transform-origin: center;
+  pointer-events: none;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(220, 38, 38, 0.35);
+}
+
+.letter-slash {
+  position: relative;
+  overflow: hidden;
+}
+
+.letter-slash::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 12%;
+  width: 76%;
+  height: 2.5px;
+  background-color: #FFFFFF;
+  transform: translateY(-50%) rotate(-35deg);
+  transform-origin: center;
+  pointer-events: none;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  70% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pop {
+  animation: popIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes lineDraw {
+  0% { stroke-dashoffset: 1000; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.animate-line-draw {
+  stroke-dasharray: 1000;
+  animation: lineDraw 0.6s ease-out forwards;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Explicit theme utilities to guarantee 100% visibility in Tailwind v4 */
+.bg-primary {
+  background-color: hsl(25 66% 47%) !important;
+}
+.hover\:bg-primary\/90:hover {
+  background-color: hsl(25 66% 42%) !important;
+}
+.bg-primary\/10 {
+  background-color: hsla(25, 66%, 47%, 0.1) !important;
+}
+.text-primary {
+  color: hsl(25 66% 47%) !important;
+}
+.text-primary-foreground {
+  color: hsl(0 0% 98%) !important;
+}
+.border-primary {
+  border-color: hsl(25 66% 47%) !important;
+}
+.border-primary\/30 {
+  border-color: hsla(25, 66%, 47%, 0.3) !important;
+}
+
+.bg-secondary {
+  background-color: hsl(240 4.8% 95.9%) !important;
+}
+.hover\:bg-secondary\/80:hover {
+  background-color: hsl(240 4.8% 92%) !important;
+}
+.bg-secondary\/40 {
+  background-color: hsla(240, 4.8%, 95.9%, 0.4) !important;
+}
+.bg-secondary\/50 {
+  background-color: hsla(240, 4.8%, 95.9%, 0.5) !important;
+}
+.text-secondary-foreground {
+  color: hsl(240 5.9% 10%) !important;
+}
+
+.border-border {
+  border-color: hsl(240 5.9% 90%) !important;
+}
+.bg-card {
+  background-color: hsl(0 0% 100%) !important;
+}
+.text-card-foreground {
+  color: hsl(240 10% 3.9%) !important;
+}
+.text-foreground {
+  color: hsl(240 10% 3.9%) !important;
+}
+.bg-muted {
+  background-color: hsl(240 4.8% 95.9%) !important;
+}
+.text-muted-foreground {
+  color: hsl(240 3.8% 46.1%) !important;
+}
