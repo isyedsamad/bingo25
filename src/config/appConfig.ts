@@ -1,4 +1,5 @@
-export const APP_BASE_URL = typeof window !== "undefined" ? window.location.origin : "https://bingo-game-4f80a.web.app";
+export const APP_BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL || "https://bingo25game.vercel.app";
 
 export const FIREBASE_CONFIG = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
