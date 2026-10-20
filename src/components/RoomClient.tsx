@@ -62,6 +62,9 @@ export default function RoomClient({ roomcode }: RoomClientProps) {
 
       if (myClaimedSlot) {
         setMySlotKey(myClaimedSlot.slotKey);
+        if (myClaimedSlot.board && myClaimedSlot.board.length === 25) {
+          setMyBoard(myClaimedSlot.board);
+        }
       } else {
         const slotKeys: SlotKey[] = ["P1", "P2", "P3", "P4", "P5", "P6"];
         const emptySlot = slotKeys
@@ -93,11 +96,18 @@ export default function RoomClient({ roomcode }: RoomClientProps) {
           }
           setRoom(updatedRoom);
           setMySlotKey((currentSlot) => {
-            if (currentSlot) return currentSlot;
-            const found = Object.values(updatedRoom.players).find(
-              (p) => p.claimed && p.sessionId === currentSessionId
-            );
-            return found ? found.slotKey : null;
+            const activeSlot =
+              currentSlot ||
+              Object.values(updatedRoom.players).find(
+                (p) => p.claimed && p.sessionId === currentSessionId
+              )?.slotKey ||
+              null;
+
+            if (activeSlot && updatedRoom.players[activeSlot]?.board?.length === 25) {
+              setMyBoard((prev) => (prev && prev.length === 25 ? prev : updatedRoom.players[activeSlot].board));
+            }
+
+            return activeSlot;
           });
         },
         (err) => {
@@ -138,10 +148,10 @@ export default function RoomClient({ roomcode }: RoomClientProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-stone-200">
+    <div className="min-h-[100dvh] flex flex-col selection:bg-stone-200">
       <Header onResetToHome={handleBackToHome} />
 
-      <main className="flex-1 flex flex-col justify-center items-center py-4 px-2 sm:px-4">
+      <main className="flex-1 flex flex-col justify-start items-center py-2 sm:py-4 px-2 sm:px-4">
         {loading && (
           <div className="text-center py-12 space-y-3">
             <Loader2 className="w-7 h-7 animate-spin text-primary mx-auto" />
@@ -192,20 +202,28 @@ export default function RoomClient({ roomcode }: RoomClientProps) {
               />
             )}
 
-            {room.status === "playing" && (
-              <GameBoard
-                myBoard={myBoard}
-                calledNumbers={room.calledNumbers || []}
-                mySlotKey={mySlotKey}
-                players={room.players || {}}
-                turnOrder={room.turnOrder || []}
-                currentTurnSlot={room.turnOrder[room.currentTurnIndex] || "P1"}
-                activeTurnStartTime={room.activeTurnStartTime || 0}
-                lastCall={room.lastCall || null}
-                onCallNumber={handleCallNumber}
-                isAiMode={false}
-              />
-            )}
+            {room.status === "playing" && (() => {
+              const rankings = room.rankings || [];
+              const rawTurnSlot = room.turnOrder[room.currentTurnIndex];
+              const resolvedTurnSlot =
+                rawTurnSlot && !rankings.includes(rawTurnSlot)
+                  ? rawTurnSlot
+                  : room.turnOrder.find((s) => !rankings.includes(s)) || "P1";
+              return (
+                <GameBoard
+                  myBoard={myBoard}
+                  calledNumbers={room.calledNumbers || []}
+                  mySlotKey={mySlotKey}
+                  players={room.players || {}}
+                  turnOrder={room.turnOrder || []}
+                  currentTurnSlot={resolvedTurnSlot}
+                  activeTurnStartTime={room.activeTurnStartTime || 0}
+                  lastCall={room.lastCall || null}
+                  onCallNumber={handleCallNumber}
+                  isAiMode={false}
+                />
+              );
+            })()}
 
             {room.status === "ended" && (
               <GameOverModal

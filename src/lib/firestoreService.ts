@@ -119,6 +119,58 @@ export async function claimPlayerSlot(
   return { success: true, sessionId };
 }
 
+export async function leavePlayerSlot(
+  roomId: string,
+  slotKey: SlotKey
+): Promise<void> {
+  const roomRef = doc(db, ROOMS_COLLECTION, roomId);
+  const snap = await getDoc(roomRef);
+  if (!snap.exists()) return;
+
+  const data = snap.data() as GameRoom;
+  const currentSlot = data.players[slotKey];
+  if (!currentSlot || !currentSlot.claimed) return;
+
+  const updatedPlayers = {
+    ...data.players,
+    [slotKey]: {
+      ...currentSlot,
+      claimed: false,
+      ready: false,
+      sessionId: "",
+      name: `Player ${slotKey.replace("P", "")}`,
+      board: [],
+      linesCount: 0
+    }
+  };
+
+  const remainingClaimed = Object.values(updatedPlayers).filter((p) => p.claimed);
+
+  if (remainingClaimed.length === 0) {
+    await updateDoc(roomRef, {
+      players: updatedPlayers,
+      status: "ended",
+      updatedAt: Date.now()
+    });
+    return;
+  }
+
+  if (currentSlot.isHost) {
+    const nextHost = remainingClaimed[0];
+    if (nextHost) {
+      updatedPlayers[nextHost.slotKey] = {
+        ...nextHost,
+        isHost: true
+      };
+    }
+  }
+
+  await updateDoc(roomRef, {
+    players: updatedPlayers,
+    updatedAt: Date.now()
+  });
+}
+
 export function subscribeToRoom(
   roomId: string,
   onUpdate: (room: GameRoom | null) => void,
@@ -264,13 +316,14 @@ export async function callNumberInRoom(
   }
 
   let nextTurnIndex = room.currentTurnIndex;
-  const unfinishedTurnOrder = room.turnOrder.filter((slot) => !newRankings.includes(slot));
-  if (unfinishedTurnOrder.length > 0) {
-    const currentCallerOrderIndex = unfinishedTurnOrder.indexOf(callerSlot);
-    if (currentCallerOrderIndex !== -1) {
-      nextTurnIndex = (currentCallerOrderIndex + 1) % unfinishedTurnOrder.length;
-    } else {
-      nextTurnIndex = 0;
+  if (finalStatus === "playing" && remainingPlayers.length > 1) {
+    for (let step = 1; step <= room.turnOrder.length; step++) {
+      const candidateIdx = (room.currentTurnIndex + step) % room.turnOrder.length;
+      const candidateSlot = room.turnOrder[candidateIdx];
+      if (!newRankings.includes(candidateSlot)) {
+        nextTurnIndex = candidateIdx;
+        break;
+      }
     }
   }
 

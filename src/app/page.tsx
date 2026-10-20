@@ -259,10 +259,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-stone-200">
+    <div className="min-h-[100dvh] flex flex-col selection:bg-stone-200">
       <Header onResetToHome={handleBackToHome} />
 
-      <main className="flex-1 flex flex-col justify-center items-center py-4 px-2 sm:px-4">
+      <main className="flex-1 flex flex-col justify-start items-center py-4 sm:py-4 px-2 sm:px-4">
         {screen === "select" && (
           <ModeSelect
             onStartVsComputer={handleStartVsComputer}

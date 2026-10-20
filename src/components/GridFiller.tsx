@@ -94,7 +94,7 @@ export default function GridFiller({
   const myColor = PLAYER_COLORS[mySlotKey ? room?.players[mySlotKey]?.colorIndex ?? 0 : 0];
 
   return (
-    <div className="w-full max-w-lg mx-auto p-3 sm:p-4 space-y-3.5 animate-pop">
+    <div className="w-full max-w-lg mx-auto px-3 py-2 sm:p-4 space-y-3 animate-pop">
       <div className="flex gap-2 overflow-x-auto pb-1.5 custom-scrollbar snap-x">
         {room ? (
           Object.keys(room.players)
@@ -110,8 +110,12 @@ export default function GridFiller({
               return (
                 <div
                   key={slot}
-                  style={{ borderColor: isMe ? myColor.border : undefined }}
-                  className="bg-card rounded-lg border border-border p-2.5 shadow-2xs min-w-[150px] sm:min-w-[160px] flex-1 shrink-0 snap-start"
+                  style={{
+                    borderColor: isMe ? myColor.primary : undefined,
+                    boxShadow: isMe ? `0 0 0 1.5px ${myColor.primary}40` : "none"
+                  }}
+                  className={`bg-card rounded-lg border p-2.5 shadow-2xs min-w-[150px] sm:min-w-[160px] flex-1 shrink-0 snap-start ${isMe ? "" : "border-border"
+                    }`}
                 >
                   <div className="flex items-center justify-between gap-1 mb-2">
                     <div className="flex items-center gap-1.5 min-w-0">
@@ -218,7 +222,7 @@ export default function GridFiller({
         )}
       </div>
 
-      <div className="modern-board-card p-3 sm:p-4 rounded-xl border border-border shadow-xs relative bg-card">
+      <div className="modern-board-card p-3 sm:p-4 rounded-xl border-2 border-primary shadow-xs relative bg-card">
         <div className="grid grid-cols-5 gap-1.5 sm:gap-2 max-w-[340px] mx-auto aspect-square relative z-10">
           {board.map((num, idx) => {
             const isFilled = num !== null;
@@ -255,7 +259,7 @@ export default function GridFiller({
           ) : (
             <span className="text-emerald-600 font-semibold flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Grid Complete
+              Complete
             </span>
           )}
         </div>
@@ -282,7 +286,7 @@ export default function GridFiller({
         <button
           onClick={handleReadyClick}
           disabled={placedCount < 25 || isSubmitted}
-          className={`w-full px-3.5 py-2 rounded-lg font-medium text-xs shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer ${placedCount === 25 && !isSubmitted
+          className={`w-full px-3.5 py-3 rounded-lg font-medium text-xs shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer ${placedCount === 25 && !isSubmitted
             ? "bg-primary hover:bg-primary/90 text-primary-foreground"
             : isSubmitted
               ? "bg-emerald-600 text-white cursor-default"

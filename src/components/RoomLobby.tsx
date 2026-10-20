@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Copy, Check, Users, Play, Crown, Trophy, Edit2, Loader2, UserPlus, ArrowLeft } from "lucide-react";
+import { Copy, Check, Users, Play, Crown, Trophy, Edit2, Loader2, UserPlus, ArrowLeft, LogOut } from "lucide-react";
 import { GameRoom, SlotKey } from "@/types/bingo";
 import { PLAYER_COLORS, APP_BASE_URL } from "@/config/appConfig";
-import { claimPlayerSlot, startFillingPhase } from "@/lib/firestoreService";
+import { claimPlayerSlot, startFillingPhase, leavePlayerSlot } from "@/lib/firestoreService";
 
 interface RoomLobbyProps {
   room: GameRoom;
@@ -22,6 +22,7 @@ export default function RoomLobby({
   const [copied, setCopied] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
   const [customName, setCustomName] = useState(() => {
     if (mySlotKey && room.players[mySlotKey]) {
       return room.players[mySlotKey].name;
@@ -87,13 +88,44 @@ export default function RoomLobby({
     }
   };
 
+  const handleLeaveRoom = async () => {
+    setIsLeaving(true);
+    try {
+      if (mySlotKey) {
+        await leavePlayerSlot(room.id, mySlotKey);
+      }
+    } finally {
+      setIsLeaving(false);
+      onBackToHome();
+    }
+  };
+
   const claimedCount = Object.values(room.players).filter((p) => p.claimed).length;
   const isHost = mySlotKey === "P1" || (mySlotKey && room.players[mySlotKey]?.isHost);
   const canStart = claimedCount >= 2;
 
   return (
     <div className="w-full max-w-lg mx-auto px-4 py-2 space-y-4 animate-pop">
-      <div className="bg-card rounded-xl border border-border shadow-none p-5 sm:p-6 text-center space-y-5">
+      <div className="bg-card rounded-xl border border-border shadow-none p-5 sm:p-6 text-center space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-border/40">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+            <Users className="w-3.5 h-3.5 text-primary" />
+            <span>Room Lobby</span>
+          </div>
+          <button
+            onClick={handleLeaveRoom}
+            disabled={isLeaving}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/20 transition-all cursor-pointer"
+          >
+            {isLeaving ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <LogOut className="w-3 h-3" />
+            )}
+            <span>Leave Room</span>
+          </button>
+        </div>
+
         <div>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
             Share the code with up to {room.maxPlayers} players. The round will start once the host launches the game.
@@ -277,10 +309,15 @@ export default function RoomLobby({
 
       <div className="text-center">
         <button
-          onClick={onBackToHome}
-          className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer inline-flex items-center gap-1.5"
+          onClick={handleLeaveRoom}
+          disabled={isLeaving}
+          className="text-xs font-medium text-muted-foreground hover:text-destructive transition-colors cursor-pointer inline-flex items-center gap-1.5"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
+          {isLeaving ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <LogOut className="w-3.5 h-3.5" />
+          )}
           <span>Leave Room</span>
         </button>
       </div>

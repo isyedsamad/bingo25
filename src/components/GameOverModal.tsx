@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
-import { Trophy, Share2, RefreshCw, Award, Bot, Sparkles, Loader2, Home } from "lucide-react";
+import { Trophy, Share2, RefreshCw, Award, Bot, Sparkles, Loader2, Home, Medal } from "lucide-react";
 import { GameRoom, SlotKey, PlayerData } from "@/types/bingo";
 import { PLAYER_COLORS, APP_BASE_URL } from "@/config/appConfig";
 import { checkLines } from "@/lib/bingoLogic";
@@ -202,11 +202,11 @@ export default function GameOverModal({
           ? "2nd Place! 🥈"
           : myRank === 3
             ? "3rd Place! 🥉"
-            : "Match Complete! 🎖️";
+            : "4th Place! 🎖️";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/50 backdrop-blur-xs animate-pop">
-      <div className="bg-card rounded-xl border border-border shadow-lg max-w-xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 text-center space-y-3.5 sm:space-y-4 custom-scrollbar">
+      <div className="bg-card rounded-xl border border-border shadow-lg max-w-xl w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-6 text-center space-y-3.5 sm:space-y-4 custom-scrollbar">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight flex items-center justify-center gap-2">
             {rankTitle}
@@ -255,13 +255,58 @@ export default function GameOverModal({
         )}
 
         {room && (
+          <div className="bg-secondary/40 rounded-md border-2 border-primary border-dashed p-3 text-left space-y-2">
+            <div className="flex items-center justify-between text-xs font-semibold text-foreground">
+              <span className="flex items-center gap-1.5">
+                <Medal className="w-3.5 h-3.5 text-amber-500" />
+                Match Results (Round {room.roundNumber})
+              </span>
+              <span className="text-[10px] text-muted-foreground">This Round</span>
+            </div>
+
+            <div className="space-y-1.5">
+              {Object.values(room.players)
+                .filter((p) => p.claimed)
+                .sort((a, b) => (a.rank || 99) - (b.rank || 99))
+                .map((p) => {
+                  const color = PLAYER_COLORS[p.colorIndex % PLAYER_COLORS.length];
+                  return (
+                    <div
+                      key={p.slotKey}
+                      className="flex items-center justify-between p-2 rounded-md bg-card border border-border text-xs shadow-2xs"
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="font-bold text-primary w-5 text-center shrink-0">
+                          #{p.rank || "-"}
+                        </span>
+                        <span style={{ backgroundColor: color.primary }} className="w-2 h-2 rounded-full shrink-0" />
+                        <span className="font-medium text-foreground truncate">
+                          {p.name} {p.slotKey === mySlotKey && "(you)"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 font-medium">
+                        <span className="text-muted-foreground text-[11px]">
+                          {p.linesCount || 0} {p.linesCount === 1 ? "line" : "lines"}
+                        </span>
+                        <span className="text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded text-[11px] border border-emerald-200/60">
+                          +{p.roundPoints || 0} pts
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
+        {room && (
           <div className="bg-secondary/40 rounded-lg border border-border p-3 text-left space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold text-foreground">
               <span className="flex items-center gap-1.5">
                 <Trophy className="w-3.5 h-3.5 text-primary" />
                 Room Leaderboard (Round {room.roundNumber})
               </span>
-              <span className="text-[10px] text-muted-foreground">Standing</span>
+              <span className="text-[10px] text-muted-foreground">Overall Standings</span>
             </div>
 
             <div className="space-y-1.5">
@@ -276,16 +321,17 @@ export default function GameOverModal({
                       className="flex items-center justify-between p-2 rounded-md bg-card border border-border text-xs shadow-2xs"
                     >
                       <div className="flex items-center gap-2 truncate">
-                        <span className="font-bold text-muted-foreground w-4">{idx + 1}</span>
+                        <span className="font-bold text-primary w-5 text-center shrink-0">
+                          #{idx + 1 || "-"}
+                        </span>
                         <span style={{ backgroundColor: color.primary }} className="w-2 h-2 rounded-full shrink-0" />
                         <span className="font-medium text-foreground truncate">
                           {p.name} {p.slotKey === mySlotKey && "(you)"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2.5 shrink-0 font-medium">
-                        <span className="text-emerald-600 font-semibold">+{p.roundPoints || 0} pts</span>
-                        <span className="text-foreground bg-secondary px-1.5 py-0.5 rounded text-[11px]">
-                          {p.totalScore || 0} total
+                        <span className="text-foreground bg-secondary px-2 py-0.5 rounded text-[11px] font-semibold border border-border">
+                          {p.totalScore || 0} pts
                         </span>
                       </div>
                     </div>

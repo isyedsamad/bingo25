@@ -1,26 +1,12 @@
-import { Suspense, use } from "react";
 import RoomClient from "@/components/RoomClient";
-import { Loader2 } from "lucide-react";
+
+export const instant = false;
 
 interface RoomPageProps {
   params: Promise<{ roomcode: string }>;
 }
 
-function RoomContent({ params }: RoomPageProps) {
-  const { roomcode } = use(params);
+export default async function RoomPage({ params }: RoomPageProps) {
+  const { roomcode } = await params;
   return <RoomClient roomcode={roomcode} />;
-}
-
-export default function RoomPage({ params }: RoomPageProps) {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="w-7 h-7 animate-spin text-primary" />
-        </div>
-      }
-    >
-      <RoomContent params={params} />
-    </Suspense>
-  );
 }
