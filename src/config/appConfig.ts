@@ -70,10 +70,10 @@ export const PLAYER_COLORS = [
 
 export const POINT_TABLE: Record<number, number[]> = {
   2: [10, 0],
-  3: [15, 7, 0],
-  4: [20, 12, 7, 0],
-  5: [25, 16, 10, 5, 0],
-  6: [30, 20, 14, 9, 4, 0]
+  3: [15, 9, 0],
+  4: [20, 14, 9, 0],
+  5: [25, 18, 14, 9, 0],
+  6: [30, 22, 17, 12, 8, 4, 0]
 };
 
 export const MOVE_TIME_LIMIT_SECONDS = 20;

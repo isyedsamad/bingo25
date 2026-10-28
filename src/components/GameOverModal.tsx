@@ -321,6 +321,7 @@ export default function GameOverModal({
                       className="flex items-center justify-between p-2 rounded-md bg-card border border-border text-xs shadow-2xs"
                     >
                       <div className="flex items-center gap-2 truncate">
+                        {/* <span className="font-bold text-muted-foreground w-4">{idx + 1}</span> */}
                         <span className="font-bold text-primary w-5 text-center shrink-0">
                           #{idx + 1 || "-"}
                         </span>
